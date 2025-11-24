@@ -9,31 +9,32 @@ from io import BytesIO
 
 st.set_page_config(page_title="Movie Recommender", layout="wide")
 
+# SIMILARITY_URL = "https://drive.google.com/uc?export=download&id=1byW4HCXhgdXrMEtoYUd3FfW0VN4jkLYX"
+KAGGLE_DATASET = "manishhbajracharya/movie-recommender-similarity-matrix"  
 SIMILARITY_FILE = "similarity.pkl"
-FILE_ID = "1byW4HCXhgdXrMEtoYUd3FfW0VN4jkLYX"
 
-def download_similarity(file_id, destination):
-    if os.path.exists(destination):
-        return
+# Set Kaggle credentials from Streamlit secrets
+os.environ["KAGGLE_USERNAME"] = st.secrets["KAGGLE_USERNAME"]
+os.environ["KAGGLE_KEY"] = st.secrets["KAGGLE_KEY"]
 
-    URL = "https://docs.google.com/uc?export=download"
-    session = requests.Session()
-    response = session.get(URL, params={'id': file_id}, stream=True)
 
-    # Handle large-file confirmation token
-    for key, value in response.cookies.items():
-        if key.startswith('download_warning'):
-            token = value
-            response = session.get(URL, params={'id': file_id, 'confirm': token}, stream=True)
-            break
+def download_similarity():
+    if not os.path.exists(SIMILARITY_FILE):
+        # st.info("Downloading similarity.pkl from Google Drive...")
+        # response = requests.get(SIMILARITY_URL)
+        # with open(SIMILARITY_FILE, "wb") as f:
+        #     f.write(response.content)
+        st.info("Downloading similarity.pkl from Kaggle...")
+        subprocess.run([
+            "kaggle", "datasets", "download",
+            "-d", KAGGLE_DATASET,
+            "--unzip"
+        ], check=True)
+        st.success("similarity.pkl downloaded!")
 
-    with open(destination, "wb") as f:
-        for chunk in response.iter_content(32768):
-            if chunk:
-                f.write(chunk)
+download_similarity()
 
-download_similarity(FILE_ID, SIMILARITY_FILE)
-
+# Load the pickle safely with caching
 @st.cache_data
 def load_similarity():
     with open(SIMILARITY_FILE, "rb") as f:
@@ -109,92 +110,4 @@ if st.button("Recommend"):
 
 
 
-
-# import os
-# import pickle
-# import pandas as pd
-# import numpy as np
-# import requests
-# from io import BytesIO
-# import streamlit as st
-# import subprocess
-
-# st.set_page_config(page_title="Movie Recommender", layout="wide")
-
-# # --- STEP 1: Set Kaggle credentials from Streamlit secrets ---
-# os.environ["KAGGLE_USERNAME"] = st.secrets["KAGGLE_USERNAME"]
-# os.environ["KAGGLE_KEY"] = st.secrets["KAGGLE_KEY"]
-
-# # --- STEP 2: Download files from Kaggle if not present ---
-# DATASET = "<username>/<dataset-name>"  # Replace with your Kaggle dataset
-
-# def download_from_kaggle():
-#     files_needed = [
-#         "movies.pkl",
-#         "movies_dict.pkl",
-#         "similarity.pkl",
-#         "tmdb_5000_movies.csv",
-#         "tmdb_5000_credits.csv"
-#     ]
-#     missing_files = [f for f in files_needed if not os.path.exists(f)]
-#     if missing_files:
-#         st.info("Downloading dataset from Kaggle…")
-#         subprocess.run([
-#             "kaggle", "datasets", "download",
-#             "-d", DATASET,
-#             "--unzip"
-#         ], check=True)
-#         st.success("Dataset downloaded!")
-
-# download_from_kaggle()
-
-# # --- STEP 3: Load data ---
-# @st.cache_data
-# def load_pickle(filename):
-#     with open(filename, "rb") as f:
-#         return pickle.load(f)
-
-# @st.cache_data
-# def load_csv(filename):
-#     return pd.read_csv(filename)
-
-# movies_dict = load_pickle("movies_dict.pkl")
-# similarity = load_pickle("similarity.pkl")
-# movies = pd.DataFrame(movies_dict)
-# tmdb = load_csv("tmdb_5000_movies.csv")
-
-# # --- STEP 4: Movie recommender logic ---
-# def fetch_poster(movie_id):
-#     tmdb_api_key = "<your_tmdb_api_key>"  # Optional, only if fetching posters dynamically
-#     url = f"https://api.themoviedb.org/3/movie/{movie_id}?api_key={tmdb_api_key}&language=en-US"
-#     data = requests.get(url).json()
-#     return "https://image.tmdb.org/t/p/w500/" + data.get("poster_path", "")
-
-# def recommend(movie):
-#     if movie not in movies['title'].values:
-#         st.warning("Movie not found!")
-#         return [], []
-#     idx = np.where(movies['title'] == movie)[0][0]
-#     distances = similarity[idx]
-#     movies_list = sorted(list(enumerate(distances)), key=lambda x: x[1], reverse=True)[1:6]
-#     recommended = []
-#     posters = []
-#     for i in movies_list:
-#         recommended.append(movies.iloc[i[0]].title)
-#         try:
-#             posters.append(fetch_poster(movies.iloc[i[0]].id))
-#         except:
-#             posters.append("")
-#     return recommended, posters
-
-# # --- STEP 5: Streamlit UI ---
-# st.title("🎬 Movie Recommender System")
-# selected_movie = st.selectbox("Select a movie", movies['title'].values)
-
-# if st.button("Recommend"):
-#     names, posters = recommend(selected_movie)
-#     cols = st.columns(5)
-#     for col, name, poster in zip(cols, names, posters):
-#         col.text(name)
-#         if poster:
-#             col.image(poster)
+st.write("Developed by Manish Harsha Bajracharya")
