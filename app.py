@@ -9,22 +9,31 @@ from io import BytesIO
 
 st.set_page_config(page_title="Movie Recommender", layout="wide")
 
-FILE_ID = "1byW4HCXhgdXrMEtoYUd3FfW0VN4jkLYX"  # Replace with your file ID
-SIMILARITY_URL = f"https://drive.google.com/uc?export=download&id={FILE_ID}"  # Replace with your file ID
 SIMILARITY_FILE = "similarity.pkl"
+FILE_ID = "1byW4HCXhgdXrMEtoYUd3FfW0VN4jkLYX"
 
-# Download file if not present
-def download_similarity():
-    if not os.path.exists(SIMILARITY_FILE):
-        st.info("Downloading similarity.pkl from Google Drive...")
-        response = requests.get(SIMILARITY_URL)
-        with open(SIMILARITY_FILE, "wb") as f:
-            f.write(response.content)
-        st.success("similarity.pkl downloaded!")
+def download_similarity(file_id, destination):
+    if os.path.exists(destination):
+        return
 
-download_similarity()
+    URL = "https://docs.google.com/uc?export=download"
+    session = requests.Session()
+    response = session.get(URL, params={'id': file_id}, stream=True)
 
-# Load similarity.pkl
+    # Handle large-file confirmation token
+    for key, value in response.cookies.items():
+        if key.startswith('download_warning'):
+            token = value
+            response = session.get(URL, params={'id': file_id, 'confirm': token}, stream=True)
+            break
+
+    with open(destination, "wb") as f:
+        for chunk in response.iter_content(32768):
+            if chunk:
+                f.write(chunk)
+
+download_similarity(FILE_ID, SIMILARITY_FILE)
+
 @st.cache_data
 def load_similarity():
     with open(SIMILARITY_FILE, "rb") as f:
@@ -37,7 +46,6 @@ similarity = load_similarity()
 movies_dict = pickle.load(open("movies_dict.pkl", "rb"))
 movies = pd.DataFrame(movies_dict)
 
-similarity = pickle.load(open("similarity.pkl", "rb"))
 
 API_KEY = "07f2044c612900790e93e23856f3246e"
 
