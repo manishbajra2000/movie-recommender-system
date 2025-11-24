@@ -9,7 +9,8 @@ from io import BytesIO
 
 st.set_page_config(page_title="Movie Recommender", layout="wide")
 
-SIMILARITY_URL = "https://drive.google.com/uc?id=1byW4HCXhgdXrMEtoYUd3FfW0VN4jkLYX"  # Replace with your file ID
+FILE_ID = "1byW4HCXhgdXrMEtoYUd3FfW0VN4jkLYX"  # Replace with your file ID
+SIMILARITY_URL = f"https://drive.google.com/uc?export=download&id={FILE_ID}"  # Replace with your file ID
 SIMILARITY_FILE = "similarity.pkl"
 
 # Download file if not present
