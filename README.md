@@ -2,6 +2,8 @@
 
 A **movie recommendation system** built with Python and Streamlit that suggests similar movies based on a precomputed similarity matrix. Movie posters are fetched dynamically from The Movie Database (TMDb) API.
 
+You can also run the live app here: https://movie-recommender-manish.streamlit.app
+
 ---
 
 ## 🛠 Features
@@ -11,6 +13,14 @@ A **movie recommendation system** built with Python and Streamlit that suggests 
 * Uses a **precomputed similarity matrix** stored on Kaggle.
 * Clean and scalable with **Streamlit caching**.
 * Easy deployment on **Streamlit Cloud**.
+
+---
+
+## 🧩 Usage
+
+1. Select a movie from the dropdown.
+2. Click **Recommend**.
+3. View **5 recommended movies** with their posters.
 
 ---
 
@@ -73,14 +83,6 @@ streamlit run app.py
 
 * The app will automatically **download `similarity.pkl` from Kaggle** if it’s missing.
 * Movie posters will be fetched from TMDb.
-
----
-
-## 🧩 Usage
-
-1. Select a movie from the dropdown.
-2. Click **Recommend**.
-3. View **5 recommended movies** with their posters.
 
 ---
 
