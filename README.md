@@ -1,8 +1,9 @@
 # 🎬 Movie Recommender System
 
-A **movie recommendation system** built with Python and Streamlit that suggests similar movies based on a precomputed similarity matrix. Movie posters are fetched dynamically from The Movie Database (TMDb) API.
+A **content-based movie recommendation system** built with Python and Streamlit. The app suggests similar movies based on a precomputed similarity matrix. Movie posters are fetched dynamically from **The Movie Database (TMDb) API**.
 
-You can also run the live app here: https://movie-recommender-manish.streamlit.app
+🔗 **Live Demo:**  
+https://movie-recommender-manish.streamlit.app
 
 ---
 
